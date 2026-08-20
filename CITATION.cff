@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If AegisForge helps your work, please cite this repository."
+title: "AegisForge: A Risk-Aware Operating System for Software-Engineering Agents"
+type: software
+abstract: >-
+  AegisForge combines deterministic risk assessment with a searchable,
+  validated, and explainable skill runtime for trustworthy software-engineering
+  agents.
+authors:
+  - family-names: Mostafa
+    given-names: Abdelrahman
+    affiliation: Software Student
+repository-code: "https://github.com/AbdelrahmanMostafa-Eng/aegisforge-unified"
+license: MIT
+version: 0.2.0
+date-released: 2026-08-20
+keywords:
+  - software agents
+  - AI engineering
+  - risk assessment
+  - developer tooling
+  - skill routing

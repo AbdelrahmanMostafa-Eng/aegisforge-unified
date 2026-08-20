@@ -1,10 +1,19 @@
 # AegisForge
 
+[![CI](https://github.com/AbdelrahmanMostafa-Eng/aegisforge-unified/actions/workflows/ci.yml/badge.svg)](https://github.com/AbdelrahmanMostafa-Eng/aegisforge-unified/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-2ea44f)](LICENSE)
+[![Status](https://img.shields.io/badge/status-alpha-orange)](CHANGELOG.md)
+
 > **A risk-aware, searchable, and testable operating system for software-engineering agents.**
 
-AegisForge combines two complementary ideas. It provides AegisForge’s focused workflow for classifying task risk and selecting proportionate engineering controls, while also providing SKILL.md’s portable skill contract, registry, validation, search, routing, and indexing runtime.
+AegisForge is a compact control plane for trustworthy agent work. It combines two complementary ideas. It provides AegisForge’s focused workflow for classifying task risk and selecting proportionate engineering controls, while also providing SKILL.md’s portable skill contract, registry, validation, search, routing, and indexing runtime.
 
 The result is intentionally conservative: a broad catalog may be discoverable, but a skill is not treated as production-ready merely because it exists. Skills declare their maturity, risk, confirmation requirements, inputs, outputs, and compatible harnesses. Experimental catalog scaffolds remain explicitly experimental until their procedures and scenario tests are specialized.
+
+## Why AegisForge
+
+Most agent frameworks optimize for code generation alone. AegisForge adds the missing operating discipline: classify risk before acting, discover the smallest suitable capability, preserve explainable evidence, and require stronger controls when a task touches production, identity, secrets, regulated data, money, or irreversible side effects.
 
 ## Core capabilities
 

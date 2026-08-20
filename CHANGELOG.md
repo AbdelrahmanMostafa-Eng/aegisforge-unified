@@ -2,6 +2,12 @@
 
 All notable changes to AegisForge are documented here.
 
+## 0.2.1 - Repository polish
+
+- Added GitHub Actions CI, issue forms, pull-request guidance, CODEOWNERS, EditorConfig, and citation metadata.
+- Added unified runtime architecture documentation and improved the public README positioning, badges, and project links.
+- Updated package metadata, security guidance, and contributor-facing repository conventions.
+
 ## [Unreleased]
 
 ### Added

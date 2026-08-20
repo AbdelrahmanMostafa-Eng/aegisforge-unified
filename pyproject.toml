@@ -20,6 +20,12 @@ classifiers = [
 ]
 dependencies = []
 
+[project.urls]
+Homepage = "https://github.com/AbdelrahmanMostafa-Eng/aegisforge-unified"
+Repository = "https://github.com/AbdelrahmanMostafa-Eng/aegisforge-unified"
+Issues = "https://github.com/AbdelrahmanMostafa-Eng/aegisforge-unified/issues"
+Documentation = "https://github.com/AbdelrahmanMostafa-Eng/aegisforge-unified/tree/main/docs"
+
 [project.scripts]
 aegisforge = "aegisforge.cli:main"
 skill = "aegisforge.cli:main"

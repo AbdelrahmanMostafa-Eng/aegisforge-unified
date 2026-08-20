@@ -1,0 +1,36 @@
+name: Feature request
+description: Propose a focused improvement to AegisForge.
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user or maintainer problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the smallest useful behavior and any non-goals.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence or example
+      description: Include a command, scenario, workflow, or representative request.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety review
+      options:
+        - label: I considered secrets, external side effects, irreversible actions, and production impact.
+          required: true
+        - label: I have not included credentials or sensitive user data.
+          required: true

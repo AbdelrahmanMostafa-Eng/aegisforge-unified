@@ -1,10 +1,10 @@
 # Security Policy
 
-SKILL.md contains instructions that may be used with tools, files, APIs, accounts, repositories, and external services. Treat every skill as untrusted until its metadata, procedure, references, and tests have been reviewed.
+AegisForge contains skills and adapters that may be used with tools, files, APIs, accounts, repositories, and external services. Treat every skill as untrusted until its metadata, procedure, references, and tests have been reviewed.
 
 ## Reporting a vulnerability
 
-Do not publish credentials, exploit details, private data, or active production targets in an issue. Open a private security report through the repository's GitHub security advisory workflow when it is enabled, or contact the maintainers through the security contact listed in the repository profile.
+Do not publish credentials, exploit details, private data, or active production targets in an issue. Use GitHub's private security advisory workflow when it is enabled. If that workflow is unavailable, contact the repository maintainer privately through the GitHub profile before disclosing details.
 
 ## Skill safety requirements
 
