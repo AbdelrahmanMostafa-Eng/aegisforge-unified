@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AbdelrahmanMostafa-Eng/aegisforge/schemas/skill-manifest.schema.json",
+  "title": "AegisForge Skill Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "description", "family", "triggers", "risk", "outputs"],
+  "properties": {
+    "name": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$"},
+    "description": {"type": "string", "minLength": 20},
+    "family": {"enum": ["core", "engineering", "security", "product", "operations", "quality", "platform", "domain"]},
+    "triggers": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "risk": {"enum": ["low", "medium", "high", "critical"]},
+    "outputs": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "references": {"type": "array", "items": {"type": "string"}},
+    "tools": {"type": "array", "items": {"type": "string"}}
+  }
+}

@@ -1,0 +1,33 @@
+name: Validate Skills
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate skill packages
+        run: PYTHONPATH=src python -m skilllib.cli --root . validate
+
+      - name: Rebuild registry
+        run: |
+          PYTHONPATH=src python -m skilllib.cli --root . index
+          git diff --exit-code -- registry/skills.json
+
+      - name: Run tests
+        run: PYTHONPATH=src python -m unittest discover -s tests -v

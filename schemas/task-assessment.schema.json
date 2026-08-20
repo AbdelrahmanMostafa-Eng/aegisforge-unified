@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AbdelrahmanMostafa-Eng/aegisforge/schemas/task-assessment.schema.json",
+  "title": "AegisForge Task Assessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "risk_level",
+    "workflow",
+    "task_type",
+    "reversible",
+    "external_side_effects",
+    "sensitive_data",
+    "production_scope",
+    "authorization_impact",
+    "ambiguity",
+    "reasons"
+  ],
+  "properties": {
+    "risk_level": {"enum": ["low", "medium", "high", "critical"]},
+    "workflow": {"enum": ["lightweight", "standard", "high-assurance"]},
+    "task_type": {"type": "string", "minLength": 1},
+    "reversible": {"type": "boolean"},
+    "external_side_effects": {"type": "boolean"},
+    "sensitive_data": {"type": "boolean"},
+    "production_scope": {"type": "boolean"},
+    "authorization_impact": {"type": "boolean"},
+    "ambiguity": {"type": "boolean"},
+    "reasons": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+  }
+}

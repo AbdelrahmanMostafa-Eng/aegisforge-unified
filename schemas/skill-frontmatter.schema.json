@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/SKILL.md/schema/skill-frontmatter.schema.json",
+  "title": "SKILL.md front matter",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "slug",
+    "version",
+    "status",
+    "summary",
+    "description",
+    "domains",
+    "capabilities",
+    "skill_type",
+    "keywords",
+    "inputs",
+    "outputs",
+    "risk",
+    "compatible_harnesses"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^(?:_core|[a-z0-9]+(?:-[a-z0-9]+)*)(?:\\.(?:_core|[a-z0-9]+(?:-[a-z0-9]+)*))+$" },
+    "name": { "type": "string", "minLength": 1 },
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$" },
+    "status": { "enum": ["draft", "experimental", "stable", "deprecated", "archived"] },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 240 },
+    "description": { "type": "string", "minLength": 1 },
+    "domains": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "capabilities": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "skill_type": { "enum": ["method", "procedure", "workflow", "pattern", "reference", "template", "tool", "policy", "evaluator", "agent", "adapter"] },
+    "keywords": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "inputs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "outputs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "risk": {
+      "type": "object",
+      "required": ["level", "confirmation"],
+      "properties": {
+        "level": { "enum": ["none", "low", "moderate", "high", "critical"] },
+        "confirmation": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "compatible_harnesses": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "requires": { "type": "object" },
+    "side_effects": { "type": "array", "items": { "type": "string" } },
+    "quality": { "type": "object" },
+    "aliases": { "type": "array", "items": { "type": "string" } },
+    "related_skills": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}
