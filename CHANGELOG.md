@@ -2,6 +2,16 @@
 
 All notable changes to AegisForge are documented here.
 
+## 0.3.0 - Trustworthy control plane
+
+- Added explicit governance states and transition gates for authorization, execution, verification, approval, and release.
+- Added structured evidence ledgers with validation, uncertainty tracking, approval metadata, and independent-verification fields.
+- Expanded risk assessment with deterministic control consequences, confirmation requirements, migration semantics, user-data signals, external-side-effect signals, and public-release signals.
+- Added a reproducible nine-scenario evaluation suite and `evaluate`, `doctor`, `inspect`, and `evidence` CLI commands.
+- Hardened front matter and registry validation with duplicate-key detection, portable relative paths, quality checks, schema checks, broken-reference checks, and registry freshness diagnostics.
+- Added compatibility-aware routing with selected and rejected alternatives.
+- Added packaged schema resources, clean-install verification, expanded regression coverage, richer documentation, and a comprehensive CI template.
+
 ## 0.2.1 - Repository polish
 
 - Added GitHub Actions CI, issue forms, pull-request guidance, CODEOWNERS, EditorConfig, and citation metadata.

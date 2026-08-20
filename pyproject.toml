@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aegisforge"
-version = "0.2.0"
+version = "0.3.0"
 description = "A risk-aware, searchable, testable operating system for software engineering agents"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -33,6 +33,9 @@ skill-md = "aegisforge.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["aegisforge*"]
+
+[tool.setuptools.package-data]
+"aegisforge" = ["py.typed", "resources/schemas/*.json"]
 
 [tool.pytest.ini_options]
 addopts = "-q"

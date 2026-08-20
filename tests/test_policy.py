@@ -28,6 +28,23 @@ class PolicyTests(unittest.TestCase):
         self.assertTrue(result.ambiguity)
         self.assertEqual(result.workflow, "standard")
 
+    def test_external_email_requires_confirmation(self):
+        result = assess("Send an email notification to every customer")
+        self.assertEqual(result.risk_level, "high")
+        self.assertTrue(result.external_side_effects)
+        self.assertTrue(result.requires_confirmation)
+
+    def test_non_destructive_migration_is_high_assurance(self):
+        result = assess("Run a database migration and backfill customer data")
+        self.assertEqual(result.risk_level, "high")
+        self.assertTrue(result.reversible)
+        self.assertIn("data or schema change", result.reasons)
+
+    def test_critical_assessment_has_release_controls(self):
+        result = assess("Delete customer records from the production database")
+        self.assertIn("human approval", result.required_controls)
+        self.assertIn("release evidence", result.required_controls)
+
 
 if __name__ == "__main__":
     unittest.main()

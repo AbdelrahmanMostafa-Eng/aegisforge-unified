@@ -1,7 +1,8 @@
-"""Risk classification and workflow selection for AegisForge.
+"""Deterministic, explainable risk assessment for agent work.
 
-The classifier is intentionally deterministic and explainable. It is a first-pass
-policy engine, not a replacement for human judgment or domain-specific review.
+The policy engine is intentionally conservative and dependency-free. It is a
+first-pass control plane: domain experts and human reviewers remain the final
+authority when context contradicts a keyword signal.
 """
 
 from __future__ import annotations
@@ -19,9 +20,49 @@ class RiskLevel(IntEnum):
     CRITICAL = 3
 
 
+_HIGH_ASSURANCE_PATTERNS: tuple[tuple[str, str], ...] = (
+    (r"\b(prod|production|live)\b", "production scope"),
+    (r"\b(delete|destroy|drop|purge|wipe|revoke|erase)\b", "destructive action"),
+    (r"\b(migrat|backfill|schema change|database|customer records)\b", "data or schema change"),
+    (r"\b(password|secret|credential|token|private key|api key)\b", "secret handling"),
+    (r"\b(oauth|sso|authentication|authorization|rbac|permission|access control)\b", "identity or authorization"),
+    (r"\b(payment|billing|transfer|purchase|financial|invoice)\b", "financial impact"),
+    (r"\b(health|medical|patient|hipaa|personal data|personal information|pii|privacy|user data|customer data)\b", "sensitive or regulated data"),
+    (r"\b(deploy|release|rollout|infrastructure|terraform|kubernetes|cloud)\b", "operational or infrastructure impact"),
+    (r"\b(external api|third-party api|external service|webhook|notify customer|notify|send (?:an? )?email|publish|post)\b", "external side effect"),
+    (r"\b(public release|release publicly|make public)\b", "public release"),
+)
+
+_MEDIUM_PATTERNS: tuple[tuple[str, str], ...] = (
+    (r"\b(feature|endpoint|api|service|integration|refactor|dependency|package)\b", "cross-file or integration change"),
+    (r"\b(ui|frontend|mobile|browser|workflow|user-facing)\b", "user-facing behavior"),
+    (r"\b(test|bug|fix|regression|performance|benchmark)\b", "behavior requiring verification"),
+)
+
+_AMBIGUITY_PATTERNS: tuple[str, ...] = (
+    r"\b(make|build|improve|update|optimize|change)\b",
+    r"\b(better|best|everything|all|as needed)\b",
+)
+
+
+def _matches(text: str, patterns: Iterable[tuple[str, str]]) -> list[str]:
+    return [reason for pattern, reason in patterns if re.search(pattern, text, re.IGNORECASE)]
+
+
+def _controls(level: RiskLevel) -> tuple[str, ...]:
+    controls = ["task framing", "targeted verification"]
+    if level >= RiskLevel.MEDIUM:
+        controls.extend(("additional verification", "review change surface"))
+    if level >= RiskLevel.HIGH:
+        controls.extend(("threat model or security review", "explicit authorization", "independent verification", "rollback or recovery plan"))
+    if level >= RiskLevel.CRITICAL:
+        controls.extend(("human approval", "release evidence", "post-change observation"))
+    return tuple(controls)
+
+
 @dataclass(frozen=True)
 class Assessment:
-    """Explainable assessment returned by the policy engine."""
+    """Structured, explainable assessment returned by the policy engine."""
 
     risk_level: str
     workflow: str
@@ -33,46 +74,21 @@ class Assessment:
     authorization_impact: bool
     ambiguity: bool
     reasons: tuple[str, ...]
+    required_controls: tuple[str, ...] = ()
+    requires_confirmation: bool = False
 
     def to_dict(self) -> dict[str, object]:
         result = asdict(self)
         result["reasons"] = list(self.reasons)
+        result["required_controls"] = list(self.required_controls)
         return result
-
-
-_HIGH_ASSURANCE_PATTERNS: tuple[tuple[str, str], ...] = (
-    (r"\b(prod|production|live)\b", "production scope"),
-    (r"\b(delete|destroy|drop|purge|wipe|revoke)\b", "destructive action"),
-    (r"\b(migrat|backfill|schema change|database)\b", "data or schema change"),
-    (r"\b(password|secret|credential|token|private key|api key)\b", "secret handling"),
-    (r"\b(oauth|sso|authentication|authorization|rbac|permission|access control)\b", "identity or authorization"),
-    (r"\b(payment|billing|transfer|purchase|financial)\b", "financial impact"),
-    (r"\b(health|medical|patient|hipaa|personal data|pii|privacy)\b", "sensitive or regulated data"),
-    (r"\b(deploy|release|rollout|infrastructure|terraform|kubernetes|cloud)\b", "operational or infrastructure impact"),
-    (r"\b(external email|send email|publish|post|webhook|notify customer)\b", "external side effect"),
-)
-
-_MEDIUM_PATTERNS: tuple[tuple[str, str], ...] = (
-    (r"\b(feature|endpoint|api|service|integration|refactor|dependency)\b", "cross-file or integration change"),
-    (r"\b(ui|frontend|mobile|browser|workflow)\b", "user-facing behavior"),
-    (r"\b(test|bug|fix|regression|performance)\b", "behavior requiring verification"),
-)
-
-_AMBIGUITY_PATTERNS: tuple[str, ...] = (
-    r"\b(make|build|improve|update|optimize)\b",
-    r"\b(better|best|everything|all|as needed)\b",
-)
-
-
-def _matches(text: str, patterns: Iterable[tuple[str, str]]) -> list[str]:
-    return [reason for pattern, reason in patterns if re.search(pattern, text, re.IGNORECASE)]
 
 
 def assess(text: str) -> Assessment:
     """Classify a natural-language task using conservative, explainable rules."""
-
     normalized = " ".join(text.split())
     if not normalized:
+        level = RiskLevel.MEDIUM
         return Assessment(
             risk_level="medium",
             workflow="standard",
@@ -84,8 +100,11 @@ def assess(text: str) -> Assessment:
             authorization_impact=False,
             ambiguity=True,
             reasons=("the task description is empty",),
+            required_controls=_controls(level),
+            requires_confirmation=False,
         )
 
+    lower = normalized.lower()
     high_reasons = _matches(normalized, _HIGH_ASSURANCE_PATTERNS)
     medium_reasons = _matches(normalized, _MEDIUM_PATTERNS)
     ambiguity = any(re.search(pattern, normalized, re.IGNORECASE) for pattern in _AMBIGUITY_PATTERNS)
@@ -97,19 +116,11 @@ def assess(text: str) -> Assessment:
         medium_reasons = []
         ambiguity = False
 
-    production_scope = any(word in normalized.lower().split() for word in ("prod", "production", "live"))
-    external_side_effects = any(
-        phrase in normalized.lower()
-        for phrase in ("send email", "publish", "post", "webhook", "notify customer")
-    )
-    sensitive_data = any(
-        phrase in normalized.lower()
-        for phrase in ("secret", "credential", "token", "personal data", "pii", "patient", "medical")
-    )
-    authorization_impact = bool(
-        re.search(r"\b(oauth|sso|authentication|authorization|rbac|permission|access control)\b", normalized, re.I)
-    )
-    reversible = not bool(re.search(r"\b(delete|destroy|drop|purge|wipe|revoke|migrat|backfill)\b", normalized, re.I))
+    production_scope = bool(re.search(r"\b(prod|production|live)\b", lower))
+    external_side_effects = bool(re.search(r"\b(external api|external service|webhook|notify customer|notify|send (?:an? )?email|publish|post)\b", lower))
+    sensitive_data = bool(re.search(r"\b(secret|credential|token|personal data|personal information|pii|patient|medical|user data|customer data)\b", lower))
+    authorization_impact = bool(re.search(r"\b(oauth|sso|authentication|authorization|rbac|permission|access control)\b", lower))
+    reversible = not bool(re.search(r"\b(delete|destroy|drop|purge|wipe|revoke|erase|irreversible|cannot be undone)\b", lower))
 
     if high_reasons:
         level = RiskLevel.CRITICAL if not reversible or production_scope else RiskLevel.HIGH
@@ -122,7 +133,6 @@ def assess(text: str) -> Assessment:
         workflow = "lightweight"
 
     task_type = "feature"
-    lower = normalized.lower()
     if trivial_documentation:
         task_type = "documentation"
     elif re.search(r"\b(debug|bug|fix|regression)\b", lower):
@@ -153,4 +163,6 @@ def assess(text: str) -> Assessment:
         authorization_impact=authorization_impact,
         ambiguity=ambiguity,
         reasons=reasons,
+        required_controls=_controls(level),
+        requires_confirmation=level >= RiskLevel.HIGH or external_side_effects or not reversible,
     )

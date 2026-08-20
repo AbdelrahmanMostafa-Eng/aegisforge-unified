@@ -26,6 +26,18 @@ Most agent frameworks optimize for code generation alone. AegisForge adds the mi
 | Registry generation | Indexing writes `registry/skills.json`, domain indexes, capability indexes, and aliases. |
 | Portable authoring | Skills remain independent of any single agent harness and can be adapted to compatible environments. |
 
+## Installation
+
+AegisForge installs as a dependency-light Python package on Python 3.11 or newer:
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install .
+```
+
+For contributor work, use `python -m pip install --editable .`. The canonical skill catalog remains in the repository so it can be reviewed, validated, and indexed from source.
+
 ## Quick start
 
 Run the commands from the repository root:
@@ -37,9 +49,17 @@ PYTHONPATH=. python3 -m aegisforge skills . --status stable
 PYTHONPATH=. python3 -m aegisforge search "debug a failing Python test" --root . --limit 5
 PYTHONPATH=. python3 -m aegisforge route "create a safe research report with citations" --root . --limit 5
 PYTHONPATH=. python3 -m aegisforge index .
+PYTHONPATH=. python3 -m aegisforge doctor .
+PYTHONPATH=. python3 -m aegisforge evaluate evaluation/scenarios.json
 ```
 
 After installation, the same entry point is available as `aegisforge`. The compatibility aliases `skill` and `skill-md` point to the same unified CLI.
+
+## Control plane and governance
+
+AegisForge separates capability discovery from permission to act. Work moves through explicit states—`planned`, `authorized`, `executed`, `verified`, `approved`, and `released`—and high-impact transitions require the appropriate actor and evidence. The structured evidence ledger records what changed, why it changed, what was executed, what passed or failed, what remains uncertain, and who independently verified the result.
+
+Read the detailed model in [`docs/concepts/control-plane.md`](docs/concepts/control-plane.md), [`docs/architecture/unified-runtime.md`](docs/architecture/unified-runtime.md), and [`docs/security/trust-model.md`](docs/security/trust-model.md).
 
 ## Risk assessment
 
@@ -87,6 +107,10 @@ Add a package at `skills/<domain>/<skill-slug>/SKILL.md`. Include valid front ma
 
 Do not use generic low-risk metadata for a skill that can publish, send, delete, deploy, pay, file, modify credentials, change production systems, or make individualized medical, legal, or financial decisions. Those skills require precise side-effect and confirmation rules.
 
+## Evaluation
+
+The repository includes nine deterministic scenarios covering safe documentation, ambiguity, dependency updates, authentication, migrations, production deployment, secret handling, external side effects, and destructive actions. Run `aegisforge evaluate evaluation/scenarios.json` before changing policy behavior. These fixtures test the control plane; they do not pretend to measure general model quality.
+
 ## Development checks
 
 ```bash
@@ -94,6 +118,10 @@ PYTHONPATH=. python3 -m unittest discover -s tests -v
 PYTHONPATH=. python3 -m aegisforge validate .
 python3 -m compileall -q aegisforge tools
 ```
+
+## Documentation
+
+Start with [`docs/getting-started.md`](docs/getting-started.md), [`docs/cli.md`](docs/cli.md), [`docs/concepts/control-plane.md`](docs/concepts/control-plane.md), [`docs/security/trust-model.md`](docs/security/trust-model.md), and [`ROADMAP.md`](ROADMAP.md).
 
 ## License
 

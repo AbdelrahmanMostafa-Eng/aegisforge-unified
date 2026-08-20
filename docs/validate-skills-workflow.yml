@@ -21,13 +21,22 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Validate skill packages
-        run: PYTHONPATH=src python -m skilllib.cli --root . validate
+      - name: Install package
+        run: python -m pip install .
+
+      - name: Validate repository contracts
+        run: aegisforge validate . --json
 
       - name: Rebuild registry
         run: |
-          PYTHONPATH=src python -m skilllib.cli --root . index
+          aegisforge index .
           git diff --exit-code -- registry/skills.json
 
+      - name: Run evaluation scenarios
+        run: aegisforge evaluate evaluation/scenarios.json --json
+
+      - name: Run diagnostics
+        run: aegisforge doctor . --json
+
       - name: Run tests
-        run: PYTHONPATH=src python -m unittest discover -s tests -v
+        run: python -m unittest discover -s tests -v

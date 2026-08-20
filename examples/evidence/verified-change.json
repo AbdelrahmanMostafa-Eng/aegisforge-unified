@@ -1,0 +1,26 @@
+{
+  "approved_by": "reviewer@example.com",
+  "change_summary": "Add a validated skill package",
+  "created_at": "2026-08-20T00:00:00+00:00",
+  "independently_verified": true,
+  "items": [
+    {
+      "command": "aegisforge validate .",
+      "description": "Repository and skill validation passed",
+      "kind": "verification",
+      "notes": "No errors or warnings reported.",
+      "outcome": "pass"
+    },
+    {
+      "command": "python -m unittest discover -s tests -v",
+      "description": "Regression and integration tests passed",
+      "kind": "test",
+      "outcome": "pass"
+    }
+  ],
+  "rationale": "The skill fills a reviewed capability gap and remains experimental until scenario coverage is complete.",
+  "uncertainties": [
+    "This example does not demonstrate domain-specific production behavior."
+  ],
+  "verifier": "independent-reviewer"
+}

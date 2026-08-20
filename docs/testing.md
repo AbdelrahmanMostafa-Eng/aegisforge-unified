@@ -25,6 +25,27 @@ When a skill is changed, preserve scenarios that previously exposed a defect. Re
 Run the baseline suite with:
 
 ```bash
-PYTHONPATH=src python3 -m skilllib.cli --root . validate
-PYTHONPATH=src python3 -m unittest discover -s tests -v
+PYTHONPATH=. python3 -m aegisforge validate .
+PYTHONPATH=. python3 -m unittest discover -s tests -v
+```
+
+## Current executable checks
+
+Run the full local quality gate with:
+
+```bash
+make check
+python3 -m compileall -q aegisforge tools
+python3 -m pip wheel --no-deps . --wheel-dir dist
+```
+
+The unified suite covers policy decisions, negative parser cases, registry discovery, routing, CLI compatibility, governance state transitions, evidence-ledger completeness, and deterministic evaluation scenarios. `aegisforge doctor . --json` provides a machine-readable readiness summary.
+
+A clean-room installation should be tested in a fresh virtual environment:
+
+```bash
+python3 -m venv /tmp/aegisforge-clean
+/tmp/aegisforge-clean/bin/python -m pip install .
+/tmp/aegisforge-clean/bin/aegisforge --version
+/tmp/aegisforge-clean/bin/aegisforge doctor . --json
 ```

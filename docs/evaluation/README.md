@@ -26,3 +26,16 @@ Report the baseline, candidate, model and version, harness, run count, failures,
 ## Anti-gaming rules
 
 Do not tune the workflow against the locked test set. Do not count generated plans or tests as success without checking behavior. Do not permit the evaluator to reward unsupported certainty. Preserve failed runs and negative findings so the project learns from them.
+
+## Repository benchmark
+
+The repository includes a small deterministic regression suite at `evaluation/scenarios.json`. It covers safe documentation, ambiguity, dependency changes, authentication, migrations, production deployment, secret handling, external side effects, and destructive production actions.
+
+Run it with:
+
+```bash
+aegisforge evaluate evaluation/scenarios.json
+aegisforge evaluate evaluation/scenarios.json --json
+```
+
+The fixture tests the control-plane boundary only. It does not claim to measure model quality, end-to-end software delivery, or domain expertise. Larger locked suites should be added as the project gains reviewed scenarios.

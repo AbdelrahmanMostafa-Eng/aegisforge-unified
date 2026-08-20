@@ -12,6 +12,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+_KEY_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
+
 
 class FrontMatterError(ValueError):
     """Raised when a SKILL.md front matter block cannot be parsed."""
@@ -78,8 +80,10 @@ def parse_front_matter(text: str) -> tuple[dict[str, Any], str]:
         key, raw_value = line.split(":", 1)
         key = key.strip()
         value = raw_value.strip()
-        if not key:
+        if not key or not _KEY_RE.fullmatch(key):
             raise FrontMatterError(f"line {line_number}: invalid metadata key")
+        if key in metadata:
+            raise FrontMatterError(f"line {line_number}: duplicate metadata key: {key}")
         if value:
             metadata[key] = _scalar(value)
             index += 1
@@ -118,8 +122,10 @@ def parse_front_matter(text: str) -> tuple[dict[str, Any], str]:
             child_key, child_raw = child_value.split(":", 1)
             child_key = child_key.strip()
             child_value = child_raw.strip()
-            if not child_key:
+            if not child_key or not _KEY_RE.fullmatch(child_key):
                 raise FrontMatterError(f"line {index + 1}: invalid nested metadata key")
+            if child_key in metadata[key]:
+                raise FrontMatterError(f"line {index + 1}: duplicate nested metadata key: {child_key}")
             metadata[key][child_key] = _scalar(child_value)
             index += 1
 

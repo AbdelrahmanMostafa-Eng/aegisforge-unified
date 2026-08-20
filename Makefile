@@ -1,4 +1,4 @@
-.PHONY: validate test skills search route index check
+.PHONY: validate test skills search route index evaluate doctor package check
 
 validate:
 	PYTHONPATH=. python3 -m aegisforge validate .
@@ -18,4 +18,13 @@ route:
 index:
 	PYTHONPATH=. python3 -m aegisforge index .
 
-check: validate test
+evaluate:
+	PYTHONPATH=. python3 -m aegisforge evaluate evaluation/scenarios.json --json
+
+doctor:
+	PYTHONPATH=. python3 -m aegisforge doctor .
+
+package:
+	python3 -m pip wheel --no-deps . -w dist
+
+check: validate test evaluate doctor

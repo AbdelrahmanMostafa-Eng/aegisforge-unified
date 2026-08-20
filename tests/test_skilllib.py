@@ -54,6 +54,16 @@ class SkillLibraryTests(unittest.TestCase):
         self.assertEqual(metadata["risk"]["level"], "low")
         self.assertIn("# Example Skill", body)
 
+    def test_parser_rejects_duplicate_metadata_keys(self):
+        malformed = VALID_SKILL.replace("name: Example Skill\n", "name: Example Skill\nname: Duplicate\n")
+        with self.assertRaises(ValueError):
+            parse_front_matter(malformed)
+
+    def test_parser_rejects_duplicate_nested_keys(self):
+        malformed = VALID_SKILL.replace("  confirmation: never\n", "  confirmation: never\n  confirmation: always\n")
+        with self.assertRaises(ValueError):
+            parse_front_matter(malformed)
+
     def test_discovery_and_validation(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

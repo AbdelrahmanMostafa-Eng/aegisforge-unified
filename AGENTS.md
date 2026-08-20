@@ -59,3 +59,9 @@ PYTHONPATH=. python3 -m aegisforge validate .
 ```
 
 Search is for discovery; route is for selecting the smallest likely skill set while preferring stable, lower-risk entries. Neither command grants permission to perform an external side effect. Generated catalog entries are experimental until their procedures, verification cases, and safety boundaries are reviewed.
+
+## Governance and evidence
+
+Do not collapse planning, authorization, execution, verification, approval, and release into one completion claim. Use `aegisforge assess` to select controls, `aegisforge doctor` and `aegisforge validate` to check repository readiness, and an evidence ledger when a change needs reviewable proof. High and critical work requires explicit authorization and independent verification; critical release requires approval and release evidence.
+
+Before changing policy behavior, run `aegisforge evaluate evaluation/scenarios.json`. Add a regression scenario when a policy defect or false positive/negative is discovered.
