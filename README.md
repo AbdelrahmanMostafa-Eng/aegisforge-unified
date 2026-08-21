@@ -1,5 +1,6 @@
 # AegisForge
 
+[![CI](https://github.com/AbdelrahmanMostafa-Eng/aegisforge-unified/actions/workflows/ci.yml/badge.svg)](https://github.com/AbdelrahmanMostafa-Eng/aegisforge-unified/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-2ea44f)](LICENSE)
 [![Status](https://img.shields.io/badge/status-alpha-orange)](CHANGELOG.md)
