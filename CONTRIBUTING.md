@@ -8,7 +8,7 @@ Read the [README](README.md), [AGENTS.md](AGENTS.md), and relevant skill files. 
 
 ## Skill standards
 
-Every skill must have a concise `SKILL.md` with valid frontmatter containing `name` and `description`. The description must explain both what the skill does and when it should trigger. Keep the body under 500 lines and use progressive disclosure for large references. Avoid duplicating information between the skill and its references.
+Every skill must have a concise `SKILL.md` with valid rich frontmatter containing its `id`, `name`, `slug`, `version`, `status`, `summary`, `description`, `domains`, `capabilities`, `skill_type`, `keywords`, `inputs`, `outputs`, `risk`, and `compatible_harnesses`. The description must explain both what the skill does and when it should trigger. New skills start as `experimental`; promotion to `stable` requires scenario-tested or production-tested quality evidence and review. Keep the body under 500 lines and use progressive disclosure for large references. Avoid duplicating information between the skill and its references.
 
 Skills should state assumptions, escalation conditions, evidence requirements, and failure handling. They must not encourage secret disclosure, unsafe execution, silent permission escalation, or unsupported claims. Domain-specific guidance should identify where qualified human review is required.
 
@@ -22,9 +22,14 @@ A pull request should explain the user problem, scope, non-goals, risk level, im
 
 ```bash
 python -m aegisforge validate .
+python -m aegisforge doctor . --json
+python -m aegisforge evaluate evaluation/scenarios.json --json
+python -m aegisforge index .
+git diff --exit-code -- registry/
 python -m unittest discover -s tests -v
+python -m pip wheel --no-deps . --wheel-dir dist
 ```
 
-For changes to workflow behavior, add or update an evaluation scenario in `docs/evaluation/`. For high-risk changes, include a threat model or explain why it is not applicable. Do not include secrets, proprietary data, or generated artifacts that cannot be redistributed.
+For changes to workflow behavior, add or update an evaluation scenario in `evaluation/` and document the result in `docs/evaluation/`. For high-risk changes, include a threat model or explain why it is not applicable. Do not include secrets, proprietary data, or generated artifacts that cannot be redistributed. The release-ready workflow definitions are maintained with the same commands and should become active once GitHub workflow-write permission is available.
 
 Maintainers may request a narrower change, independent verification, documentation improvements, or a rollback plan before merging.

@@ -32,6 +32,14 @@ ALLOWED_SKILL_TYPES = {
 ALLOWED_RISK_LEVELS = {"none", "low", "moderate", "high", "critical"}
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$")
+REGISTRY_FILES = ("skills.json", "domains.json", "capabilities.json", "aliases.json")
+UNSAFE_BODY_PATTERNS: tuple[tuple[str, str], ...] = (
+    (r"\b(?:curl|wget)[^\n|]*\|\s*(?:ba)?sh\b", "pipes downloaded content directly into a shell"),
+    (r"\brm\s+-rf\s+/(?:\s|$)", "contains destructive root deletion"),
+    (r"\bcat[ \t]+(?:~?/)?\.ssh/", "reads SSH credential material"),
+    (r"\b(?:printenv|env)\b[^\n]*(?:curl|wget)", "sends environment data to a remote downloader"),
+    (r"\b(?:base64|xxd)[^\n|]*\|[^\n]*(?:curl|wget)", "encodes data before sending it to a remote endpoint"),
+)
 
 
 @dataclass(frozen=True)
@@ -153,9 +161,17 @@ def validate_skill(path: str | Path, *, root: str | Path | None = None) -> list[
             issues.append(ValidationIssue(display_path, "stable skill contains experimental scaffold language", "error", "stable-scaffold"))
         if re.search(r"\b(TODO|TBD|coming soon)\b", body, re.IGNORECASE):
             issues.append(ValidationIssue(display_path, "skill contains unresolved placeholder language", "warning", "placeholder-text"))
+        for pattern, message in UNSAFE_BODY_PATTERNS:
+            if re.search(pattern, body, re.IGNORECASE):
+                issues.append(ValidationIssue(display_path, f"unsafe skill instruction: {message}", "error", "unsafe-instruction"))
         for reference in metadata.get("references", []) if isinstance(metadata.get("references"), list) else []:
             if isinstance(reference, str) and reference.startswith("file:"):
-                target = path.parent / reference[5:]
+                target = (path.parent / reference[5:]).resolve()
+                try:
+                    target.relative_to(path.parent.resolve())
+                except ValueError:
+                    issues.append(ValidationIssue(display_path, f"file reference escapes skill directory: {reference}", "error", "path-traversal"))
+                    continue
                 if not target.exists():
                     issues.append(ValidationIssue(display_path, f"referenced file does not exist: {reference}", "error", "broken-reference"))
     except (OSError, FrontMatterError, ValueError, AttributeError) as exc:
@@ -220,13 +236,17 @@ def write_registry(root: str | Path, records: Iterable[SkillRecord]) -> Path:
 
 
 def registry_is_fresh(root: str | Path) -> bool:
-    """Return whether the generated registry is newer than every skill source."""
+    """Return whether every generated registry index is present and current."""
     root = Path(root).resolve()
-    registry = root / "registry" / "skills.json"
-    if not registry.is_file():
+    registry_dir = root / "registry"
+    generated = [registry_dir / filename for filename in REGISTRY_FILES]
+    if not all(path.is_file() for path in generated):
         return False
-    registry_time = registry.stat().st_mtime_ns
-    return all(path.stat().st_mtime_ns <= registry_time for path in (root / "skills").rglob("SKILL.md"))
+    source_paths = list((root / "skills").rglob("SKILL.md"))
+    if not source_paths:
+        return False
+    newest_source = max(path.stat().st_mtime_ns for path in source_paths)
+    return all(path.stat().st_mtime_ns >= newest_source for path in generated)
 
 
 def load_registry(root: str | Path) -> list[SkillRecord]:

@@ -20,6 +20,17 @@ class EvidenceTests(unittest.TestCase):
         ledger.add_uncertainty("Failure is tracked for follow-up.")
         self.assertFalse(ledger.passed)
 
+    def test_unknown_evidence_cannot_pass(self):
+        ledger = EvidenceLedger("Change", "Reason")
+        ledger.add("verification", "Result was not observed", outcome="unknown")
+        self.assertFalse(ledger.passed)
+        self.assertIn("all evidence items must pass before work can be verified or released", ledger.validate())
+
+    def test_not_run_evidence_blocks_release(self):
+        ledger = EvidenceLedger("Change", "Reason", approved_by="reviewer")
+        ledger.add("test", "Production test was skipped", outcome="not-run")
+        self.assertIn("all evidence items must pass before work can be verified or released", ledger.validate(require_approval=True))
+
     def test_ledger_round_trips_and_passes(self):
         ledger = EvidenceLedger("Change", "Reason", approved_by="reviewer", independently_verified=True, verifier="independent")
         ledger.add("test", "Unit tests passed", outcome="pass", command="python -m unittest")

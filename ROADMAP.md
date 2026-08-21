@@ -2,7 +2,7 @@
 
 AegisForge grows by measured capability, not by accumulating prompts. Every stage must preserve the portable skill contract and add evaluation evidence before claiming improvement.
 
-## Current foundation — 0.2.x
+## Current foundation — 0.3.0
 
 The current foundation provides deterministic risk assessment, explicit governance states, structured evidence ledgers, a searchable skill registry, explainable routing, schema checks, repository diagnostics, a reproducible scenario suite, portable adapters, and contributor-facing documentation. The large catalog remains honest about its maturity: most entries are experimental scaffolds.
 

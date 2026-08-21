@@ -11,6 +11,9 @@ All notable changes to AegisForge are documented here.
 - Hardened front matter and registry validation with duplicate-key detection, portable relative paths, quality checks, schema checks, broken-reference checks, and registry freshness diagnostics.
 - Added compatibility-aware routing with selected and rejected alternatives.
 - Added packaged schema resources, clean-install verification, expanded regression coverage, richer documentation, and a comprehensive CI template.
+- Prepared CI and security workflow definitions for supported Python versions, generated-index synchronization, wheel/source installation, CLI smoke tests, dependency auditing, secret hygiene, and unsafe-content checks. Activation requires GitHub workflow-write permission.
+- Hardened evidence gates so unknown or not-run checks cannot be treated as verified work.
+- Hardened skill validation against unsafe downloaded-shell instructions and file-reference path traversal.
 
 ## 0.2.1 - Repository polish
 

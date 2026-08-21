@@ -49,3 +49,22 @@ python3 -m venv /tmp/aegisforge-clean
 /tmp/aegisforge-clean/bin/aegisforge --version
 /tmp/aegisforge-clean/bin/aegisforge doctor . --json
 ```
+
+## Release verification
+
+The complete release gate is:
+
+```bash
+python -m unittest discover -s tests -v
+python -m aegisforge validate . --json
+python -m aegisforge doctor . --json
+python -m aegisforge evaluate evaluation/scenarios.json --json
+python -m aegisforge index .
+git diff --exit-code -- registry/
+python -m build
+python -m pip check
+python -m pip install pip-audit
+python -m pip_audit --local
+```
+
+For packaging verification, install the generated wheel and a fresh source checkout into separate virtual environments, then run `aegisforge --version`, `aegisforge assess ... --json`, and `aegisforge doctor . --json`. The release-ready GitHub workflows repeat these checks on Python 3.11 and 3.12 and add repository secret-hygiene checks; they require workflow-write permission to activate.

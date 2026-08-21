@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 Outcome = Literal["pass", "fail", "not-run", "unknown"]
+VALID_OUTCOMES = {"pass", "fail", "not-run", "unknown"}
 
 
 @dataclass(frozen=True)
@@ -61,6 +62,8 @@ class EvidenceLedger:
         )
         if not item.kind or not item.description:
             raise ValueError("evidence kind and description must be non-empty")
+        if item.outcome not in VALID_OUTCOMES:
+            raise ValueError(f"evidence outcome must be one of {sorted(VALID_OUTCOMES)}")
         self.items.append(item)
         return item
 
@@ -82,6 +85,9 @@ class EvidenceLedger:
             findings.append("at least one evidence item is required")
         if not any(item.kind in {"test", "verification", "build", "security", "runtime"} for item in self.items):
             findings.append("at least one test or verification item is required")
+        non_passing = [item for item in self.items if item.outcome != "pass"]
+        if non_passing:
+            findings.append("all evidence items must pass before work can be verified or released")
         if any(item.outcome == "fail" for item in self.items) and not self.uncertainties:
             findings.append("failed evidence requires an uncertainty or remediation note")
         if require_approval and not self.approved_by:
@@ -111,7 +117,13 @@ class EvidenceLedger:
 
     @classmethod
     def from_dict(cls, payload: dict[str, Any]) -> "EvidenceLedger":
-        items = [EvidenceItem(**item) for item in payload.get("items", [])]
+        raw_items = payload.get("items", [])
+        if not isinstance(raw_items, list) or not all(isinstance(item, dict) for item in raw_items):
+            raise ValueError("evidence items must be a list of objects")
+        items = [EvidenceItem(**item) for item in raw_items]
+        for item in items:
+            if item.outcome not in VALID_OUTCOMES:
+                raise ValueError(f"evidence outcome must be one of {sorted(VALID_OUTCOMES)}")
         values = {key: value for key, value in payload.items() if key != "items"}
         return cls(items=items, **values)
 
